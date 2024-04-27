@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+</head>
+<style>
+.htab table{
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    thead tr {
+        background-color: #009879;
+        color: #ffffff;
+        text-align: left;
+    }
+    th, td{
+        padding: 12px 15px;
+    }
+    tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+
+    tbody tr:last-of-type {
+        border-bottom: 2px solid #009879;
+    }
+    tbody tr.active-row {
+        font-weight: bold;
+        color: #009879;
+    }
+
+}
+
+.mtitl{
+    text-align: left;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.tar{
+    height: 300px;
+    resize: vertical;
+    background-image: linear-gradient(#f1f1f1 50%, #f9f9f9 50%);
+  background-size: 100% 4rem;
+  border: 1px solid #CCC;
+  width: 95%;
+  height: 400px;
+  line-height: 2rem;
+  margin: 0 auto;
+  padding: 4px 8px;
+  outline: none;
+}
+
+.imgp{
+    display: flex;
+    flex-wrap: wrap;
+}
+.fixl{
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 400px;
+    overflow: hidden;
+    margin: 5px;
+
+}
+</style>
+<body>
+    <center>
+        <section class="dfw">
+            <h1 style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Log Analysis Dashboard</h1>
+            <p style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Loaded from parsed CSV {{dname}}</p>
+        </section>
+        <h2 class="mtitl">First 5 rows:</h2>
+        <p class="mtitl">Ensure the selected file is correct: {{dname}}</p>
+        <div id="headTable" class="htab"></div>
+        <h2 class="mtitl">Months Available in Logs:</h2>
+        <div class="mtitl" id="mnth"></div>
+        <h1 style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Error Analysis:</h1>
+        <h2 class="mtitl">All errors recorded in server:</h2>
+        <textarea class="tar" id="tmx" readonly></textarea>
+        <div class="imgp">
+            <img id="high" class="fixl" src="">
+            <img id="low" class="fixl" src="">
+        </div>
+        <img id="med" src="" style="width:80%;">
+        <h2 style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Highest Errors is Caused by:</h2>
+        <p style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">IP Address {{hec}} - A total of {{hect}} times</p>
+        <br>
+        <img id="hiip" src="" style="height: 650px;width:auto;">
+
+    </center>
+
+    {% if datalst: %}
+        <script>
+            var json_S  = `{{ datalst| tojson | safe}}`;
+            var dat = JSON.parse(json_S);
+            headhtm = dat.head;
+            var decodedHead = atob(headhtm);
+            document.getElementById('headTable').innerHTML = decodedHead;
+            var months = atob(dat.months)
+            mstr = months.replace(/'/g, '"');
+            var marr = JSON.parse(mstr);
+            for (var i = 0; i < marr.length; i++) {
+                var np = document.createElement("label");
+                if( i > 0){
+                    np.innerText = ", "+marr[i]
+                }else{
+                    np.innerText = marr[i]
+                }
+                
+                document.getElementById("mnth").append(np)
+            }
+            document.getElementById("tmx").innerHTML = atob(dat.errors);
+            document.getElementById("high").src = "data:image/png;base64,"+dat.highip
+            document.getElementById("low").src = "data:image/png;base64,"+dat.lowip
+            document.getElementById("med").src = "data:image/png;base64,"+dat.median
+            document.getElementById("hiip").src = "data:image/png;base64,"+dat.higheh
+
+
+
+
+        </script>
+    {% endif %}
+</body>
+</html>
